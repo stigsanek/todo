@@ -15,7 +15,8 @@ export default class App extends Component {
       this.createItem('Drink Coffee'),
       this.createItem('Make Awesome App'),
       this.createItem('Build React App')
-    ]
+    ],
+    term: ''
   }
 
   createItem(title) {
@@ -90,8 +91,25 @@ export default class App extends Component {
     });
   }
 
+  search(items, term) {
+    if (term.length == 0) {
+      return items;
+    }
+
+    return items.filter((element) => {
+      const item = element.label.toLowerCase();
+      return item.indexOf(term.toLowerCase()) > -1;
+    });
+  }
+
+  onSearchItem = (term) => {
+    this.setState({ term });
+  }
+
   render() {
-    const { todoData } = this.state;
+    const { todoData, term } = this.state;
+
+    const visibleItems = this.search(todoData, term);
 
     const doneCount = todoData.filter((element) => {
       return element.done;
@@ -103,12 +121,12 @@ export default class App extends Component {
         <AppHeader todo={todoCount} done={doneCount} />
 
         <div className="top-panel d-flex">
-          <SearchPanel />
+          <SearchPanel onSearchItem={this.onSearchItem} />
           <ItemStatusFilter />
         </div>
 
         <TodoList
-          todos={todoData}
+          todos={visibleItems}
           onDelete={this.deleteItem}
           onToggleDone={this.onToggleDone}
           onToggleImportant={this.onToggleImportant}
